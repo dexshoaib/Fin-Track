@@ -1,0 +1,204 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Expense - FinTrack</title>
+    
+    <style>
+        /* Base Reset & Core Theme Colors */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        html, body {
+            height: 100%;
+            background-color: #020617; /* Slate 950 */
+            color: #f8fafc; /* Slate 100 */
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        /* Perfect Center Layout Wrapper */
+        .wrapper-center {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        /* Large Centered Container Box */
+        .card-custom {
+            background-color: #0f172a; /* Slate 900 */
+            border: 1px solid #1e293b; /* Slate 800 */
+            border-radius: 16px;
+            width: 100%;
+            max-width: 550px; /* Large layout size */
+            padding: 40px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Header Styles */
+        .mb-4 { margin-bottom: 24px; }
+        .mb-5 { margin-bottom: 32px; }
+        
+        .header-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 8px;
+        }
+        .header-subtitle {
+            font-size: 0.875rem;
+            color: #94a3b8; /* Slate 400 */
+        }
+
+        /* Back Button Link */
+        .link-back {
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 0.85rem;
+            display: inline-block;
+            margin-bottom: 20px;
+            transition: color 0.2s;
+        }
+        .link-back:hover {
+            color: #10b981; /* Emerald 500 */
+        }
+
+        /* Form Inputs & Form Labels */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-label-custom {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #94a3b8;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .form-control-custom {
+            width: 100%;
+            background-color: #020617; /* Slate 950 */
+            border: 1px solid #1e293b; /* Slate 800 */
+            color: #f8fafc;
+            border-radius: 10px;
+            padding: 12px 14px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .form-control-custom:focus {
+            border-color: #10b981; /* Emerald 500 */
+        }
+
+        /* Action Buttons Row */
+        .btn-group {
+            display: flex;
+            gap: 16px;
+        }
+        .btn-base {
+            font-family: inherit;
+            font-weight: 600;
+            font-size: 0.95rem;
+            padding: 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            border: none;
+            text-decoration: none;
+            text-align: center;
+            transition: background-color 0.2s;
+        }
+        .btn-cancel {
+            width: 30%;
+            background-color: #1e293b; /* Slate 800 */
+            color: #cbd5e1; /* Slate 300 */
+        }
+        .btn-cancel:hover {
+            background-color: #334155; /* Slate 700 */
+            color: #f8fafc;
+        }
+        .btn-emerald {
+            width: 70%;
+            background-color: #10b981; /* Emerald 500 */
+            color: #020617; /* Slate 950 */
+        }
+        .btn-emerald:hover {
+            background-color: #059669; /* Emerald 600 */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="wrapper-center">
+        <div class="card-custom">
+            
+            <!-- Navigation -->
+            <div>
+                <a href="{% url 'home' %}" class="link-back">
+                    &larr; Back to Dashboard
+                </a>
+            </div>
+
+            <!-- Titles -->
+            <header class="mb-4">
+                <h1 class="header-title">Modify Expense Record</h1>
+                <p class="header-subtitle">Update the details for this transaction below.</p>
+            </header>
+            
+            <!-- Data Form -->
+            <form action="{% url 'edit_expense' get_expense.id %}" method="POST">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label class="form-label-custom">Title / Item</label>
+                    <input type="text" 
+                           name="expense_name" 
+                           value="{{ get_expense.expense_name }}" 
+                           required 
+                           placeholder="e.g., Grocery run" 
+                           class="form-control_custom form-control-custom">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label-custom">Amount ($)</label>
+                    <input type="number" 
+                           name="amount" 
+                           value="{{ get_expense.amount|stringformat:'.2f' }}" 
+                           step="0.01" 
+                           required 
+                           placeholder="0.00" 
+                           class="form-control-custom">
+                </div>
+
+                <div class="form-group mb-5">
+                    <label class="form-label-custom">Category</label>
+                    <select name="category" class="form-control-custom">
+                        <option value="food" {% if get_expense.category == 'food' %}selected{% endif %}>Food & Drinks</option>
+                        <option value="bills" {% if get_expense.category == 'bills' %}selected{% endif %}>Bills & Utilities</option>
+                        <option value="entertainment" {% if get_expense.category == 'entertainment' %}selected{% endif %}>Entertainment</option>
+                        <option value="transport" {% if get_expense.category == 'transport' %}selected{% endif %}>Transport</option>
+                        <option value="other" {% if get_expense.category == 'other' %}selected{% endif %}>Other</option>
+                    </select>
+                </div>
+
+                <!-- Action Footer -->
+                <div class="btn-group">
+                    <a href="{% url 'home' %}" class="btn-base btn-cancel">
+                        Cancel
+                    </a>
+                    <button type="submit" class="btn-base btn-emerald">
+                        Update Changes
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+</body>
+</html>
